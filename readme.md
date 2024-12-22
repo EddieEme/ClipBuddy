@@ -3,9 +3,8 @@
 ---
 
 ## **List of Team Members**
-1. [Your Name]
-2. [Team Member 2]
-3. [Team Member 3] (if applicable)
+1. Emeremnu Ediosn M (edisonemeremnu@gmail.com)
+2. Tasie Ibiam
 
 ---
 
