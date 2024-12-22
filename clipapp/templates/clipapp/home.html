@@ -1,0 +1,109 @@
+{% extends 'clipapp/index.html' %}  'clipapp/index.html'}
+{% comment %} {% block title %}Home{% endblock %} {% endcomment %}
+{% block content %}
+  <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>Manage Your Snippets Like a Pro</h1>
+                <p>Store, organize, and access your code snippets from anywhere. Boost your productivity with
+                    ClipBuddy's intelligent clipboard manager.</p>
+                <a href="login.html" class="cta-button">Get Started</a>
+            </div>
+            <div class="hero-image">
+                <div class="demo-container">
+                    <div class="demo-snippet">
+                        console.log("Hello World!");
+                    </div>
+                    <div class="demo-snippet">
+                        def greet(name):
+                        return f"Hello, {name}!"
+                    </div>
+                    <div class="demo-snippet">
+                        SELECT * FROM users
+                        WHERE active = true;
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <h3>Smart Organization</h3>
+                <p>Automatically categorize your snippets with intelligent tagging and search.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <h3>Sync Everywhere</h3>
+                <p>Access your snippets across all your devices with real-time synchronization.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3>Quick Search</h3>
+                <p>Find any snippet instantly with powerful search and filtering capabilities.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials">
+        <div class="testimonials-container">
+            <h2>What Our Users Say</h2>
+            <div class="testimonial-card">
+                <p>"ClipBuddy has revolutionized how I manage my code snippets. It's an essential tool in my daily
+                    workflow."</p>
+                <cite>- Sarah Chen, Software Engineer</cite>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-links">
+                <h4>ClipBuddy</h4>
+                <p>Your smart clipboard manager for increased productivity.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Product</h4>
+                <a href="#">Feature</a>
+                <a href="#">Pricing</a>
+                <a href="#">Documentation</a>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <a href="#">About</a>
+                <a href="#">Blog</a>
+                <a href="#">Careers</a>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Security</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simple scroll animation for demo snippets
+        const demoSnippets = document.querySelectorAll('.demo-snippet');
+
+        function animateSnippets() {
+            demoSnippets.forEach((snippet, index) => {
+                setTimeout(() => {
+                    snippet.style.transform = 'translateY(-10px)';
+                    snippet.style.opacity = '0';
+                    setTimeout(() => {
+                        snippet.style.transform = 'translateY(0)';
+                        snippet.style.opacity = '1';
+                    }, 300);
+                }, index * 2000);
+            });
+        }
+
+        // Run animation every 6 seconds
+        setInterval(animateSnippets, 6000);
+    </script>
+
+    {% endblock %}
