@@ -1,0 +1,44 @@
+{% extends 'clipapp/index.html' %}
+{% block content %}
+<div class="login-box"> 
+    <div class="container">
+        <div class="tabs">
+            {% comment %} <div class="tab active" onclick="switchTab('login')">Login</div> {% endcomment %}
+            <div class="tab" onclick="switchTab('signup')">Sign Up</div>
+        </div>
+
+        <form id="signup" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="signup-name">Full Name</label>
+                <input type="text" name="full_name" id="signup-name" required>
+            </div>
+            <div class="form-group">
+                <label for="signup-email">Email</label>
+                <input type="email" name="email" id="signup-email" required>
+            </div>
+            <div class="form-group">
+                <label for="signup-password">Password</label>
+                <input type="password" name="password" id="signup-password" required>
+            </div>
+            <div class="form-group">
+                <label for="signup-confirm-password">Confirm Password</label>
+                <input type="password" name="password1" id="signup-confirm-password" required>
+            </div>
+            <button type="submit">Sign Up</button>
+            <div class="divider">or</div>
+            <button type="button" class="google-btn" onclick="googleAuth()">
+                <!-- Google button SVG here -->
+                Continue with Google
+            </button>
+            <a href="{% url 'clipapp:login' %}">Already have an account? Login</a>
+        </form> 
+    </div>
+</div>
+
+<script>
+    function googleAuth() {
+        alert('Google authentication would be implemented here');
+    }
+</script>
+{% endblock %}
