@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import get_user_model
 from django.contrib import messages
-from accounts.models import *
+
 
 # Create your views here.
 
@@ -40,7 +40,6 @@ def register_view(request):
         last_name = ' '.join(full_name.split(' ')[1:])
         
         user = User.objects.create_user(
-            username=email,
             email=email, 
             first_name=first_name,
             last_name=last_name,
@@ -48,7 +47,7 @@ def register_view(request):
         )
         
         messages.success(request, "Registration successful.")
-        return redirect('login')
+        return redirect('clipapp:login')
     return render(request, 'clipapp/register.html')
     
 # Login view
@@ -65,8 +64,14 @@ def login_view(request):
         
         if user is not None:
             login(request, user)
-            return redirect('home')  # Redirect to a home page or dashboard
+            return redirect('clipapp:dashboard')
         else:
             messages.error(request, "Invalid email or password")
     
     return render(request, 'clipapp/login.html')
+
+
+
+def dashboard_view(request):
+    
+    return render(request, 'clipapp/login_page.html')
