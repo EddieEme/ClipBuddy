@@ -1,0 +1,175 @@
+{% extends 'clipapp/login_nav.html' %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="profile-header">
+            <h1>Profile Settings</h1>
+            <p>Manage your account preferences and security settings</p>
+        </div>
+
+        <!-- Change Password Section -->
+        <div class="section">
+            <h2>Change Password</h2>
+            <div id="passwordSuccess" class="success-message">
+                Password successfully updated!
+            </div>
+            <div id="passwordError" class="error-message">
+                Error updating password. Please try again.
+            </div>
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label for="currentPassword">Current Password</label>
+                    <input type="password" id="currentPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">New Password</label>
+                    <input type="password" id="newPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm New Password</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Update Password</button>
+            </form>
+        </div>
+
+        <!-- Notification Preferences Section -->
+        <div class="section">
+            <h2>Notification Preferences</h2>
+            <div class="form-group">
+                <div class="toggle-switch">
+                    <label>
+                        <input type="checkbox" id="emailNotifications" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>Email Notifications</span>
+                </div>
+                <div class="toggle-switch">
+                    <label>
+                        <input type="checkbox" id="desktopNotifications">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>Desktop Notifications</span>
+                </div>
+                <div class="toggle-switch">
+                    <label>
+                        <input type="checkbox" id="weeklyDigest" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>Weekly Digest</span>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="saveNotificationPreferences()">Save Preferences</button>
+        </div>
+
+        <!-- Export Data Section -->
+        <div class="section">
+            <h2>Export Data</h2>
+            <p style="margin-bottom: 1rem;">Download all your snippets and settings</p>
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="exportData('json')">Export as JSON</button>
+                <button class="btn btn-secondary" onclick="exportData('txt')">Export as Text</button>
+            </div>
+        </div>
+
+        <!-- Logout Section -->
+        <div class="section">
+            <h2>Session</h2>
+            <button class="btn btn-danger" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        // Password change handling
+        document.getElementById('passwordForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                showMessage('passwordError', 'New passwords do not match!');
+                return;
+            }
+
+            // Simulate API call
+            setTimeout(() => {
+                showMessage('passwordSuccess', 'Password updated successfully!');
+                this.reset();
+            }, 1000);
+        });
+
+        // Show message helper function
+        function showMessage(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 3000);
+        }
+
+        // Save notification preferences
+        function saveNotificationPreferences() {
+            const preferences = {
+                email: document.getElementById('emailNotifications').checked,
+                desktop: document.getElementById('desktopNotifications').checked,
+                weekly: document.getElementById('weeklyDigest').checked
+            };
+
+            // Simulate API call
+            setTimeout(() => {
+                showMessage('notificationSuccess', 'Preferences saved successfully!');
+            }, 500);
+        }
+
+        // Export data function
+        function exportData(format) {
+            // Sample data
+            const data = {
+                snippets: [
+                    { id: 1, content: 'console.log("Hello World")', language: 'javascript' },
+                    { id: 2, content: 'print("Hello World")', language: 'python' }
+                ],
+                settings: {
+                    theme: 'light',
+                    fontSize: 14
+                }
+            };
+
+            let content;
+            let filename;
+            let type;
+
+            if (format === 'json') {
+                content = JSON.stringify(data, null, 2);
+                filename = 'clipbuddy-export.json';
+                type = 'application/json';
+            } else {
+                content = Object.entries(data).map(([key, value]) =>
+                    `${key}:\n${JSON.stringify(value, null, 2)}`
+                ).join('\n\n');
+                filename = 'clipbuddy-export.txt';
+                type = 'text/plain';
+            }
+
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Simulate logout
+                window.location.href = '/login';
+            }
+        }
+    </script>
+{% endblock %}

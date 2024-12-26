@@ -1,0 +1,29 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'clipapp/styles/login_page.css' %}" >
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{% url 'clipapp:dashboard' %}" class="brand">ClipBuddy</a>
+            <div class="nav-links">
+                <a href="{% url 'clipapp:dashboard' %}">Dashboard</a>
+                <a href="{% url 'clipapp:snippet' %}">Add Snippet</a>
+                <a href="{% url 'clipapp:settings' %}">Profile</a>
+            </div>
+            <button class="mobile-menu-btn">☰</button>
+        </div>
+    </nav>
+</body>
+ {% block content %}
+{% endblock %}
+
+</html>

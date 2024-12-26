@@ -1,3 +1,8 @@
 from django.contrib import admin
+from . models import *
 
-# Register your models here.
+@admin.register(Snippet)
+class SnippetAdmin(admin.ModelAdmin):
+    list_display = ('title', 'user', 'favorite', 'created_at', 'updated_at')
+    list_filter = ('favorite', 'tags', 'created_at')
+    search_fields = ('title', 'description', 'tags')

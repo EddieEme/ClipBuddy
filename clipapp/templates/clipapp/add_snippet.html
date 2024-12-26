@@ -1,0 +1,166 @@
+{% extends 'clipapp/login_nav.html' %}
+{% block title %}Add Snippet{% endblock %}
+{% block content %}
+    <main class="main-container">
+        <h1 class="page-title">Add New Snippet</h1>
+
+        <form class="snippet-form" method="post" id="snippetForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" class="form-control" placeholder="Enter snippet title" required>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <input type="text" id="description" name="description" class="form-control" placeholder="Brief description of the snippet">
+            </div>
+
+            <div class="form-group">
+                <label for="content">Content</label>
+                <textarea id="content" name="content" class="form-control" placeholder="Paste your code snippet here" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="tags">Tags</label>
+                <div class="tags-input" id="tagsContainer">
+                    <input type="text" id="tagInput" placeholder="Add tags (press Enter)">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="favorite" name="favorite"> Mark as favorite
+                </label>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="history.back()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Snippet</button>
+            </div>
+        </form>
+    </main>
+
+    <script>
+    // Tags handling
+const tagsContainer = document.getElementById('tagsContainer');
+let tagInput = document.getElementById('tagInput');
+let tags = new Set();
+
+function addTag(tagName) {
+    tagName = tagName.trim();
+    if (tagName && !tags.has(tagName)) {
+        tags.add(tagName);
+        renderTags();
+    }
+    tagInput.value = '';
+}
+
+function removeTag(tagName) {
+    tags.delete(tagName);
+    renderTags();
+}
+
+function renderTags() {
+    // Render tags as HTML
+    const tagElements = Array.from(tags).map(tag => `
+        <span class="tag">
+            ${tag}
+            <button type="button" class="tag-remove" onclick="removeTag('${tag}')">&times;</button>
+        </span>
+    `).join('');
+
+    // Update tagsContainer content without reassigning tagInput
+    tagsContainer.innerHTML = tagElements;
+    const inputElement = document.createElement('input');
+    inputElement.type = 'text';
+    inputElement.id = 'tagInput';
+    inputElement.placeholder = 'Add tags (press Enter)';
+    inputElement.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addTag(inputElement.value.trim());
+        }
+    });
+
+    tagsContainer.appendChild(inputElement);
+    tagInput = inputElement; // Update the global `tagInput` reference
+}
+
+function setupTagInput() {
+    tagInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addTag(tagInput.value.trim());
+        }
+    });
+}
+
+setupTagInput();
+
+
+        // Form submission
+        const snippetForm = document.getElementById('snippetForm');
+        snippetForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const snippetData = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                content: document.getElementById('content').value,
+                tags: Array.from(tags),  // Send as array
+                favorite: document.getElementById('favorite').checked
+            };
+
+            // Validation check
+            if (!snippetData.title || !snippetData.content) {
+                showNotification('Title and content are required.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/snippets/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(snippetData),
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showNotification('Snippet saved successfully!', 'success');
+                    snippetForm.reset();
+                    tags.clear();
+                    renderTags();
+                    // Optionally redirect to dashboard or snippet list
+                    window.location.href = 'http://127.0.0.1:8000/dashboard/';
+                } else {
+                    const errorData = await response.json();
+                    const errorMessage = errorData.detail || 
+                        Object.values(errorData).flat().join(', ') || 
+                        'Failed to save snippet';
+                    showNotification(errorMessage, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('An unexpected error occurred.', 'error');
+            }
+        });
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    </script>
+{% endblock %}
