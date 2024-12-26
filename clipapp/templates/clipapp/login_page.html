@@ -9,24 +9,7 @@
         </div>
 
         <div class="snippet-grid">
-            <!-- Sample Snippet Card -->
-            <div class="snippet-card">
-                <div class="snippet-header">
-                    <h3>Example Snippet</h3>
-                    <button class="btn-secondary">⭐</button>
-                </div>
-                <div class="snippet-content">
-                    console.log("Hello World!");
-                </div>
-                <div class="snippet-tags">
-                    <span class="tag">JavaScript</span>
-                    <span class="tag">Basics</span>
-                </div>
-                <div class="snippet-actions">
-                    <button class="btn btn-secondary">Copy</button>
-                    <button class="btn btn-primary">Edit</button>
-                </div>
-            </div>
+            <!-- Snippet cards will be dynamically populated here -->
         </div>
     </main>
 
@@ -64,17 +47,6 @@
                 .catch(err => console.error('Failed to copy:', err));
         }
 
-        // Sample data structure for snippets
-        const snippets = [
-            {
-                id: 1,
-                title: 'Example Snippet',
-                content: 'console.log("Hello World!");',
-                tags: ['JavaScript', 'Basics'],
-                favorite: false
-            }
-        ];
-
         // Function to render snippets
         function renderSnippets(snippetsArray) {
             const grid = document.querySelector('.snippet-grid');
@@ -106,19 +78,42 @@
             `).join('');
         }
 
-        // Initial render
-        renderSnippets(snippets);
+        // Fetch snippets from the API
+        async function fetchSnippets() {
+            try {
+                const response = await fetch('/api/snippets/', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    }
+                });
+                if (response.ok) {
+                    const snippets = await response.json();
+                    renderSnippets(snippets);
+                } else {
+                    console.error('Failed to fetch snippets', response);
+                }
+            } catch (error) {
+                console.error('Error fetching snippets', error);
+            }
+        }
+
+        // Initial fetch and render snippets
+        fetchSnippets();
 
         // Search functionality
         const searchInput = document.querySelector('.search-bar input');
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            const filteredSnippets = snippets.filter(snippet =>
-                snippet.title.toLowerCase().includes(searchTerm) ||
-                snippet.content.toLowerCase().includes(searchTerm) ||
-                snippet.tags.some(tag => tag.toLowerCase().includes(searchTerm))
-            );
-            renderSnippets(filteredSnippets);
+            const grid = document.querySelector('.snippet-grid');
+            const allSnippets = grid.querySelectorAll('.snippet-card');
+            allSnippets.forEach(snippet => {
+                const title = snippet.querySelector('h3').textContent.toLowerCase();
+                const content = snippet.querySelector('.snippet-content').textContent.toLowerCase();
+                const tags = Array.from(snippet.querySelectorAll('.tag')).map(tag => tag.textContent.toLowerCase());
+                const matches = title.includes(searchTerm) || content.includes(searchTerm) || tags.some(tag => tag.includes(searchTerm));
+                snippet.style.display = matches ? 'block' : 'none';
+            });
         });
     </script>
 {% endblock %}

@@ -110,3 +110,9 @@ class SnippetView(APIView):
             response_data['redirect_url'] = '/dashboard/'
             return Response(response_data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+    def get(self, request):
+        snippets = Snippet.objects.filter(user=request.user)
+        serializer = SnippetSerializer(snippets, many=True)
+        return Response(serializer.data)
