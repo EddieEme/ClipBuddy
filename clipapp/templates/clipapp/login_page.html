@@ -2,118 +2,418 @@
 {% block title %}Dashboard{% endblock %}
 {% block content %}
 
-    <main class="dashboard-container">
-        <div class="search-bar">
-            <span class="search-icon">🔍</span>
-            <input type="text" placeholder="Search snippets...">
-        </div>
+<main class="dashboard-container">
+    <!-- Search bar for searching snippets -->
+    <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Search snippets...">
+    </div>
 
-        <div class="snippet-grid">
-            <!-- Snippet cards will be dynamically populated here -->
-        </div>
-    </main>
+    <!-- Loading indicator -->
+    <div id="loadingIndicator" style="display: none; text-align: center; padding: 20px;">
+        Loading snippets...
+    </div>
 
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-links">
-                <a href="#">About</a>
-                <a href="#">Contact</a>
-                <a href="#">Privacy Policy</a>
+    <!-- Error message container -->
+    <div id="errorContainer" style="display: none; color: red; text-align: center; padding: 20px;">
+    </div>
+
+    <!-- Container for snippet cards -->
+    <div class="snippet-grid">
+        <!-- Snippet cards will be dynamically populated here -->
+    </div>
+
+    <!-- Empty state message -->
+    <div id="emptyState" style="display: none; text-align: center; padding: 20px;">
+        No snippets found. Create your first snippet to get started!
+    </div>
+    
+    <div class="divider"></div>
+    
+    <!-- Updated pagination controls -->
+    <div class="pagination">
+        <button id="prev-btn" class="btn btn-primary" onclick="loadPage(currentPage - 1)">Previous</button>
+        <span id="pageInfo"></span>
+        <button id="next-btn" class="btn btn-secondary" onclick="loadPage(currentPage + 1)">Next</button>
+    </div>
+
+    <!-- Modal for displaying full content -->
+    <div id="snippetModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <span class="close-modal">&times;</span>
             </div>
-            <div class="copyright">
-                © 2024 ClipBuddy
+            <div class="modal-body">
+                <div id="modalContent" class="formatted-content"></div>
             </div>
         </div>
-    </footer>
+    </div>
+</main>
 
-    <script>
-        // Mobile menu toggle
-        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-        const navLinks = document.querySelector('.nav-links');
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-links">
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+            <a href="#">Privacy Policy</a>
+        </div>
+        <div class="copyright">
+            © 2024 ClipBuddy
+        </div>
+    </div>
+</footer>
 
-        mobileMenuBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
+<style>
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 20px;
+    width: 80%;
+    max-width: 800px;
+    border-radius: 8px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-body {
+    overflow-y: auto;
+    padding: 20px;
+    flex-grow: 1;
+    max-height: calc(80vh - 100px);
+}
+
+.formatted-content {
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.6;
+    font-family: inherit;
+}
+
+.close-modal {
+    cursor: pointer;
+    font-size: 24px;
+    color: #666;
+}
+
+.close-modal:hover {
+    color: #000;
+}
+
+/* Truncated content styles */
+.snippet-content {
+    max-height: 100px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 10px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.5;
+}
+
+.snippet-content::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    background: linear-gradient(transparent, white);
+    pointer-events: none;
+}
+
+.read-more-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-bottom: 16px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 34px;
+    padding: 1rem 0;
+}
+
+.pagination button {
+    min-width: 100px;
+    transition: all 0.3s ease;
+    padding: 8px 16px;
+    border-radius: 4px;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#pageInfo {
+    font-size: 0.9rem;
+    color: #666;
+    padding: 0 1rem;
+}
+
+.divider {
+    border-top: 2px solid #ccc;
+    margin: 20px 0;
+    width: 100%;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+}
+</style>
+
+<script>
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;')
+        .replace(/\n/g, '<br>');
+}
+
+let currentPage = 1;
+let totalPages = 1;
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadPage(1);
+});
+
+function showLoading() {
+    document.getElementById('loadingIndicator').style.display = 'block';
+    document.getElementById('errorContainer').style.display = 'none';
+}
+
+function hideLoading() {
+    document.getElementById('loadingIndicator').style.display = 'none';
+}
+
+function showError(message) {
+    const errorContainer = document.getElementById('errorContainer');
+    errorContainer.textContent = message;
+    errorContainer.style.display = 'block';
+}
+
+async function loadPage(page) {
+    try {
+        showLoading();
+        if (page < 1) return;
+        
+        const response = await fetch(`/api/snippets/?page=${page}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+                'Content-Type': 'application/json'
+            }
         });
 
-        // Dark mode toggle
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // Copy snippet functionality
-        function copySnippet(content) {
-            navigator.clipboard.writeText(content)
-                .then(() => alert('Copied to clipboard!'))
-                .catch(err => console.error('Failed to copy:', err));
+        const data = await response.json();
+        
+        if (data.results && Array.isArray(data.results)) {
+            currentPage = page;
+            totalPages = Math.ceil(data.count / data.results.length);
+            renderSnippets(data.results);
+            updatePaginationControls(data);
+            document.getElementById('emptyState').style.display = 
+                data.results.length === 0 ? 'block' : 'none';
+        } else {
+            throw new Error('Invalid data format received from server');
         }
+    } catch (error) {
+        console.error('Error loading snippets:', error);
+        showError(`Failed to load snippets: ${error.message}`);
+    } finally {
+        hideLoading();
+    }
+}
 
-        // Function to render snippets
-        function renderSnippets(snippetsArray) {
-            const grid = document.querySelector('.snippet-grid');
-            grid.innerHTML = snippetsArray.map(snippet => `
-                <div class="snippet-card">
-                    <div class="snippet-header">
-                        <h3>${snippet.title}</h3>
-                        <button class="btn-secondary" onclick="toggleFavorite(${snippet.id})">
-                            ${snippet.favorite ? '⭐' : '☆'}
-                        </button>
-                    </div>
-                    <div class="snippet-content">
-                        ${snippet.content}
-                    </div>
-                    <div class="snippet-tags">
-                        ${snippet.tags.map(tag => `
-                            <span class="tag">${tag}</span>
-                        `).join('')}
-                    </div>
-                    <div class="snippet-actions">
-                        <button class="btn btn-secondary" onclick="copySnippet('${snippet.content}')">
-                            Copy
-                        </button>
-                        <button class="btn btn-primary" onclick="editSnippet(${snippet.id})">
-                            Edit
-                        </button>
-                    </div>
+function renderSnippets(snippetsArray) {
+    const grid = document.querySelector('.snippet-grid');
+    if (!grid) {
+        console.error('Snippet grid container not found');
+        return;
+    }
+
+    grid.innerHTML = snippetsArray.map(snippet => {
+        const content = snippet.content || '';
+        const needsTrunc = content.length > 400;
+        const displayContent = needsTrunc ? 
+            content.substring(0, 400) + '...' : 
+            content;
+        
+        const encodedContent = encodeURIComponent(content);
+        const escapedDisplayContent = escapeHtml(displayContent);
+        const escapedTitle = escapeHtml(snippet.title || 'Untitled');
+        
+        return `
+            <div class="snippet-card">
+                <div class="snippet-header">
+                    <h3>${escapedTitle}</h3>
+                    <button class="btn-secondary" onclick="toggleFavorite(${snippet.id})">
+                        ${snippet.favorite ? '⭐' : '☆'}
+                    </button>
                 </div>
-            `).join('');
-        }
-
-        // Fetch snippets from the API
-        async function fetchSnippets() {
-            try {
-                const response = await fetch('/api/snippets/', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-                    }
-                });
-                if (response.ok) {
-                    const snippets = await response.json();
-                    renderSnippets(snippets);
-                } else {
-                    console.error('Failed to fetch snippets', response);
+                <div class="snippet-content">${escapedDisplayContent}</div>
+                ${needsTrunc ? 
+                    `<button class="read-more-btn" 
+                        onclick="openModal('${escapedTitle}', '${encodedContent}')">
+                        Read More
+                    </button>` : ''
                 }
-            } catch (error) {
-                console.error('Error fetching snippets', error);
-            }
-        }
+                <div class="snippet-tags">
+                    ${(snippet.tags || []).map(tag => 
+                        `<span class="tag">${escapeHtml(tag)}</span>`
+                    ).join('')}
+                </div>
+                <div class="snippet-actions">
+                    <button class="btn btn-secondary" 
+                        onclick="copySnippet('${encodedContent}')">
+                        Copy
+                    </button>
+                    <button class="btn btn-primary" 
+                        onclick="editSnippet(${snippet.id})">
+                        Edit
+                    </button>
+                    <button class="btn btn-danger" 
+                        onclick="deleteSnippet(${snippet.id})">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
 
-        // Initial fetch and render snippets
-        fetchSnippets();
+function updatePaginationControls(data) {
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const pageInfo = document.getElementById('pageInfo');
+    
+    if (prevBtn) {
+        prevBtn.disabled = !data.previous;
+        prevBtn.style.display = data.previous ? 'block' : 'none';
+    }
 
-        // Search functionality
-        const searchInput = document.querySelector('.search-bar input');
-        searchInput.addEventListener('input', (e) => {
+    if (nextBtn) {
+        nextBtn.disabled = !data.next;
+        nextBtn.style.display = data.next ? 'block' : 'none';
+    }
+
+    if (pageInfo) {
+        pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+    }
+}
+
+// Modal functionality
+const modal = document.getElementById('snippetModal');
+const modalTitle = document.getElementById('modalTitle');
+const modalContent = document.getElementById('modalContent');
+const closeButton = document.querySelector('.close-modal');
+
+function openModal(title, content) {
+    if (!modal || !modalTitle || !modalContent) {
+        console.error('Modal elements not found');
+        return;
+    }
+    
+    try {
+        const decodedContent = decodeURIComponent(content);
+        modalTitle.textContent = title;
+        modalContent.innerHTML = escapeHtml(decodedContent);
+        
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    } catch (error) {
+        console.error('Error opening modal:', error);
+    }
+}
+
+function closeModal() {
+    if (!modal) return;
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+if (closeButton) {
+    closeButton.onclick = closeModal;
+}
+
+window.onclick = function(event) {
+    if (event.target === modal) {
+        closeModal();
+    }
+}
+
+function copySnippet(content) {
+    try {
+        const decodedContent = decodeURIComponent(content);
+        navigator.clipboard.writeText(decodedContent)
+            .then(() => alert('Copied to clipboard!'))
+            .catch(err => console.error('Failed to copy:', err));
+    } catch (error) {
+        console.error('Error copying content:', error);
+    }
+}
+
+// Search functionality
+const searchInput = document.querySelector('.search-bar input');
+if (searchInput) {
+    let searchTimeout;
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
             const searchTerm = e.target.value.toLowerCase();
             const grid = document.querySelector('.snippet-grid');
             const allSnippets = grid.querySelectorAll('.snippet-card');
+            
             allSnippets.forEach(snippet => {
                 const title = snippet.querySelector('h3').textContent.toLowerCase();
                 const content = snippet.querySelector('.snippet-content').textContent.toLowerCase();
-                const tags = Array.from(snippet.querySelectorAll('.tag')).map(tag => tag.textContent.toLowerCase());
-                const matches = title.includes(searchTerm) || content.includes(searchTerm) || tags.some(tag => tag.includes(searchTerm));
+                const tags = Array.from(snippet.querySelectorAll('.tag'))
+                    .map(tag => tag.textContent.toLowerCase());
+                
+                const matches = title.includes(searchTerm) || 
+                              content.includes(searchTerm) || 
+                              tags.some(tag => tag.includes(searchTerm));
+                              
                 snippet.style.display = matches ? 'block' : 'none';
             });
-        });
-    </script>
+        }, 300); // Debounce search for better performance
+    });
+}
+</script>
+
 {% endblock %}

@@ -10,6 +10,14 @@ from .serializers import SnippetSerializer
 from django.contrib.auth.decorators import login_required
 from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.csrf import ensure_csrf_cookie
+from rest_framework.pagination import PageNumberPagination
+
+
+class SnippetPagination(PageNumberPagination):
+    page_size = 9
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+    
 
 def index(request):
     return render(request, 'clipapp/index.html')
@@ -98,14 +106,12 @@ class SnippetView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        # Add the user to the request data
         data = request.data.copy()
         data['user'] = request.user.id
 
         serializer = SnippetSerializer(data=data)
         if serializer.is_valid():
             serializer.save(user=request.user)
-            # Combine serialized data with the redirect URL
             response_data = serializer.data
             response_data['redirect_url'] = '/dashboard/'
             return Response(response_data, status=status.HTTP_201_CREATED)
@@ -113,6 +119,8 @@ class SnippetView(APIView):
     
     
     def get(self, request):
-        snippets = Snippet.objects.filter(user=request.user)
-        serializer = SnippetSerializer(snippets, many=True)
-        return Response(serializer.data)
+        snippets = Snippet.objects.all().order_by('-created_at')
+        paginator = SnippetPagination()
+        paginated_snippets = paginator.paginate_queryset(snippets, request)
+        serializer = SnippetSerializer(paginated_snippets, many=True)
+        return paginator.get_paginated_response(serializer.data)
