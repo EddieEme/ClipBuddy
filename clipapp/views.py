@@ -154,7 +154,7 @@ class SnippetView(APIView):
     
     
     def get(self, request):
-        snippets = Snippet.objects.all().order_by('-created_at')
+        snippets = Snippet.objects.filter(user=request.user).order_by('-created_at')
         paginator = SnippetPagination()
         paginated_snippets = paginator.paginate_queryset(snippets, request)
         serializer = SnippetSerializer(paginated_snippets, many=True)
