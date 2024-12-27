@@ -2,7 +2,7 @@
 {% block title %}Add Snippet{% endblock %}
 {% block content %}
     <main class="main-container">
-        <h1 class="page-title">Add New Snippet</h1>
+        <h1 class="page-title">Add Snippet</h1>
 
         <form class="snippet-form" method="post" id="snippetForm">
             {% csrf_token %}
@@ -36,7 +36,7 @@
 
             <div class="form-actions">
                 <button type="button" class="btn btn-secondary" onclick="history.back()">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save Snippet</button>
+                <button type="submit" class="btn btn-primary">Add Snippet</button>
             </div>
         </form>
     </main>

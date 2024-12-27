@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import get_user_model
 from django.contrib import messages
@@ -11,10 +11,13 @@ from django.contrib.auth.decorators import login_required
 from rest_framework.permissions import IsAuthenticated
 from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework.pagination import PageNumberPagination
+from django.views.decorators.http import require_http_methods
+from django.http import JsonResponse, HttpResponseNotFound
+
 
 
 class SnippetPagination(PageNumberPagination):
-    page_size = 9
+    page_size = 6
     page_size_query_param = 'page_size'
     max_page_size = 100
     
@@ -82,8 +85,40 @@ def dashboard_view(request):
 def snippet_view(request):
     return render(request, 'clipapp/add_snippet.html')
 
+
+@login_required(login_url='clipapp:login') 
 def user_setting(request):
     return render(request, 'clipapp/users_settings.html')
+
+
+
+
+def edit_view(request, id):
+    snippet = get_object_or_404(Snippet, id=id)
+
+    if request.method == 'POST':
+        # Update snippet with data from the form
+        snippet.title = request.POST.get('title')
+        snippet.description = request.POST.get('description')
+        snippet.content = request.POST.get('content')
+        snippet.favorite = request.POST.get('favorite') == 'on'
+        snippet.tags = request.POST.get('tags', '').split(',')
+        snippet.save()
+        return redirect('clipapp:dashboard')
+
+    return render(request, 'clipapp/edit_snippet.html', {'snippet': snippet})
+
+
+# def delete_view(request, id):
+#     """
+#     View to delete an object by ID.
+#     """
+#     obj = get_object_or_404(YourModel, id=id)
+#     obj.delete()
+#     messages.success(request, "The item has been successfully deleted.")
+
+#     return redirect('clipapp:dashboard')
+
 
 # class SnippetView(APIView):
 #     permission_classes = [IsAuthenticated]
@@ -101,7 +136,7 @@ def user_setting(request):
     
     
 
-
+# ..............................................APIs........................................................
 class SnippetView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -124,3 +159,26 @@ class SnippetView(APIView):
         paginated_snippets = paginator.paginate_queryset(snippets, request)
         serializer = SnippetSerializer(paginated_snippets, many=True)
         return paginator.get_paginated_response(serializer.data)
+    
+    
+@login_required
+@require_http_methods(["DELETE"])
+def delete_snippet(request, id):
+    """
+    View to delete a snippet by ID.
+    Only allows deletion if the user owns the snippet.
+    """
+    try:
+        snippet = get_object_or_404(Snippet, id=id, user=request.user)
+        snippet.delete()
+        
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Snippet successfully deleted'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
