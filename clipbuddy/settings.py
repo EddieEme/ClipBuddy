@@ -134,6 +134,14 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 
+LOGIN_URL = 'clipapp:login'
+ACCOUNT_SIGNUP_URL = 'clipapp:register'
+
+# Allauth specific settings
+ACCOUNT_LOGIN_TEMPLATE = None 
+ACCOUNT_SIGNUP_TEMPLATE = None
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
 
 # # Provider specific settings
 # SOCIALACCOUNT_PROVIDERS = {
