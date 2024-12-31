@@ -41,8 +41,18 @@ INSTALLED_APPS = [
     'clipapp',
     'accounts',
     'corsheaders',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     
 ]
+
+
+SITE_ID = 1
+
+LOGIN_REDIRECT_URL = 'clipapp:dashboard'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -53,7 +63,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
+    "allauth.account.middleware.AccountMiddleware",
 ]
+
+
 
 ROOT_URLCONF = 'clipbuddy.urls'
 
@@ -89,6 +103,11 @@ DATABASES = {
 }
 
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -109,6 +128,34 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+
+LOGIN_URL = 'clipapp:login'
+ACCOUNT_SIGNUP_URL = 'clipapp:register'
+
+# Allauth specific settings
+ACCOUNT_LOGIN_TEMPLATE = None 
+ACCOUNT_SIGNUP_TEMPLATE = None
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
+
+# # Provider specific settings
+# SOCIALACCOUNT_PROVIDERS = {
+#     'google': {
+#         # For each OAuth based provider, either add a ``SocialApp``
+#         # (``socialaccount`` app) containing the required client
+#         # credentials, or list them here:
+#         'APP': {
+#             'client_id': '123',
+#             'secret': '456',
+#             'key': ''
+#         }
+#     }
+# }
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
