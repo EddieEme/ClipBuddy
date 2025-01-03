@@ -25,5 +25,14 @@
 </body>
  {% block content %}
 {% endblock %}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const menuButton = document.querySelector(".mobile-menu-btn");
+        const navLinks = document.querySelector(".nav-links");
 
+        menuButton.addEventListener("click", () => {
+            navLinks.classList.toggle("active");
+        });
+    });
+</script>
 </html>

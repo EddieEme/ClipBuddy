@@ -8,6 +8,7 @@
    <title>{% block title %}ClipBuddy{% endblock %}</title>
     <link rel="stylesheet" href="{%  static 'clipapp/styles/index.css' %}">
     <link rel="stylesheet" href="{%  static 'clipapp/styles/login.css' %}">
+    <link rel="stylesheet" href="{%  static 'clipapp/styles/testimonial.css' %}">
 </head>
 
 <body>
@@ -17,12 +18,25 @@
             <div class="nav-links">
                 <a href="{% url 'clipapp:home' %}">Home</a>
                 <a href="#contact">Contact</a>
+                <a href="{% url 'clipapp:testimonial' %}">Testimonial</a>
                 <a href="{% url 'clipapp:login' %}" class="cta-button">Get Started</a>
             </div>
+            <button class="mobile-menu-btn">☰</button>
         </div>
     </nav>
     {% block content %}
     {% endblock %}
 </body>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const menuButton = document.querySelector(".mobile-menu-btn");
+        const navLinks = document.querySelector(".nav-links");
+
+        menuButton.addEventListener("click", () => {
+            navLinks.classList.toggle("active");
+        });
+    });
+</script>
 
 </html>

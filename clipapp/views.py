@@ -5,7 +5,7 @@ from django.contrib import messages
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Snippet
+from .models import Snippet, UserTestimonial
 from .serializers import SnippetSerializer
 from django.contrib.auth.decorators import login_required
 from rest_framework.permissions import IsAuthenticated
@@ -13,6 +13,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework.pagination import PageNumberPagination
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse, HttpResponseNotFound
+from .forms import TestimonialForm
 
 
 
@@ -27,6 +28,30 @@ def index(request):
 
 def home(request):
     return render(request, 'clipapp/home.html')
+
+
+@login_required(login_url='clipapp:login') 
+def testimonial_view(request):
+    # # Check if the user is authenticated
+    # if not request.user.is_authenticated:
+    #     return redirect('clipapp:login')
+    
+    print(f"Request user: {request.user}")
+    print(f"User authenticated: {request.user.is_authenticated}")
+    
+    if request.method == 'POST':
+        form = TestimonialForm(request.POST)
+        if form.is_valid():
+            testimonial = form.save(commit=False)
+            testimonial.user = request.user
+            testimonial.save()
+            messages.success(request, 'Thank you for your testimonial!')
+            return redirect('clipapp:testimonial')
+    else:
+        form = TestimonialForm()
+    
+    return render(request, 'clipapp/testimonial.html', {'form': form})
+
 
 def register_view(request):
     if request.method == 'POST':
@@ -92,7 +117,7 @@ def user_setting(request):
 
 
 
-
+@login_required(login_url='clipapp:login') 
 def edit_view(request, id):
     snippet = get_object_or_404(Snippet, id=id)
 
@@ -108,33 +133,6 @@ def edit_view(request, id):
 
     return render(request, 'clipapp/edit_snippet.html', {'snippet': snippet})
 
-
-# def delete_view(request, id):
-#     """
-#     View to delete an object by ID.
-#     """
-#     obj = get_object_or_404(YourModel, id=id)
-#     obj.delete()
-#     messages.success(request, "The item has been successfully deleted.")
-
-#     return redirect('clipapp:dashboard')
-
-
-# class SnippetView(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     def post(self, request):
-#         # Add the user to the request data
-#         data = request.data.copy()
-#         data['user'] = request.user.id
-        
-#         serializer = SnippetSerializer(data=data)
-#         if serializer.is_valid():
-#             serializer.save(user=request.user)
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    
 
 # ..............................................APIs........................................................
 class SnippetView(APIView):

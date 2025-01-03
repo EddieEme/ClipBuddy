@@ -12,3 +12,12 @@ class Snippet(models.Model):
     favorite = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    
+class UserTestimonial(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    text = models.TextField()
+    
+    def __str__(self):
+        return f"{self.text} - {self.user.name}"
+    

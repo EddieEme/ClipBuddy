@@ -272,7 +272,7 @@ function renderSnippets(snippetsArray) {
 
     grid.innerHTML = snippetsArray.map(snippet => {
         const content = snippet.content || '';
-        const needsTrunc = content.length > 400;
+        const needsTrunc = content.length > 100;
         const displayContent = needsTrunc ? 
             content.substring(0, 400) + '...' : 
             content;

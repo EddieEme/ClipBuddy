@@ -1,0 +1,54 @@
+{% extends 'clipapp/index.html' %}
+{% block content %}
+<div class="testimonial-container">
+    <h2 class="testimonial-title">Share Your Experience</h2>
+    
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <form class="testimonial-form" method="post">
+        {% csrf_token %}
+        {% if form.errors %}
+        <div class="alert alert-error">
+            Please correct the errors below.
+        </div>
+        {% endif %}
+        
+        {% for field in form %}
+        <div class="form-group">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.errors %}
+            <div class="error-message">
+                {% for error in field.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+        
+        <button type="submit" class="submit-button">
+            Submit Testimonial
+        </button>
+    </form>
+
+    {% if user_testimonials %}
+    <div class="previous-testimonials">
+        <h3>Your Previous Testimonials</h3>
+        {% for testimonial in user_testimonials %}
+        <div class="testimonial-item">
+            <p>{{ testimonial.text }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

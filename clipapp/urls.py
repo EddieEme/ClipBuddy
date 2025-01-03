@@ -11,6 +11,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard_view, name='dashboard'),
     path('add_snippet/', views.snippet_view, name='snippet'),
     path('settings/', views.user_setting, name='settings'),
+    path('testimonial/', views.testimonial_view, name='testimonial'),
     path('edit_snippet/<int:id>/', views.edit_view, name='edit_snippet'),
     
     
