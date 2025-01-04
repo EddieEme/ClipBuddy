@@ -1,9 +1,9 @@
-{% extends 'clipapp/index.html' %}
+{% extends 'clipapp/login_nav.html' %}
 {% block content %}
 <div class="testimonial-container">
     <h2 class="testimonial-title">Share Your Experience</h2>
     
-    {% if messages %}
+  {% if messages %}
     <div class="messages">
         {% for message in messages %}
         <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">

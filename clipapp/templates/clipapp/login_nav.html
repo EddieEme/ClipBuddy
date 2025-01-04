@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Dashboard{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'clipapp/styles/login_page.css' %}" >
+    <link rel="stylesheet" href="{%  static 'clipapp/styles/testimonial.css' %}">
 </head>
 
 <body>
@@ -17,6 +18,7 @@
             <div class="nav-links">
                 <a href="{% url 'clipapp:dashboard' %}">Dashboard</a>
                 <a href="{% url 'clipapp:snippet' %}">Add Snippet</a>
+                <a href="{% url 'clipapp:testimonial' %}">Testimonial</a>
                 <a href="{% url 'clipapp:settings' %}">Profile</a>
             </div>
             <button class="mobile-menu-btn">☰</button>

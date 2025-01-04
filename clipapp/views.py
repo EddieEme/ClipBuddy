@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import get_user_model
 from django.contrib import messages
@@ -30,15 +31,12 @@ def home(request):
     return render(request, 'clipapp/home.html')
 
 
-@login_required(login_url='clipapp:login') 
+@login_required
 def testimonial_view(request):
-    # # Check if the user is authenticated
-    # if not request.user.is_authenticated:
-    #     return redirect('clipapp:login')
-    
-    print(f"Request user: {request.user}")
-    print(f"User authenticated: {request.user.is_authenticated}")
-    
+    """
+    If the user is not authenticated, redirect them to login.
+    After login, redirect them back to this testimonial view.
+    """
     if request.method == 'POST':
         form = TestimonialForm(request.POST)
         if form.is_valid():
@@ -49,8 +47,9 @@ def testimonial_view(request):
             return redirect('clipapp:testimonial')
     else:
         form = TestimonialForm()
-    
+
     return render(request, 'clipapp/testimonial.html', {'form': form})
+
 
 
 def register_view(request):
@@ -85,21 +84,31 @@ def register_view(request):
         return redirect('clipapp:login')
     return render(request, 'clipapp/register.html')
 
+
 def login_view(request):
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
         
-        User = get_user_model()
         user = authenticate(request, email=email, password=password)
-        
         if user is not None:
             login(request, user)
-            return redirect('clipapp:dashboard')
+            return redirect(next_url)
         else:
             messages.error(request, "Invalid email or password")
-    
+
     return render(request, 'clipapp/login.html')
+
+
+
+def logout_view(request):
+    if request.method == 'POST':
+        logout(request)
+        return JsonResponse({"message": "Successfully logged out"}, status=200)
+    else:
+        return JsonResponse({"error": "Invalid request method"}, status=405)
+    
+
 
 @login_required(login_url='clipapp:login') 
 def dashboard_view(request):
