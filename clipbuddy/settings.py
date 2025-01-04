@@ -184,7 +184,7 @@ STATICFILES_DIRS = [
 ]
 
 # Static files collected in production
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
 # Default primary key field type
