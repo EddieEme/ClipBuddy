@@ -90,13 +90,15 @@ def login_view(request):
         email = request.POST['email']
         password = request.POST['password']
         
+        User = get_user_model()
         user = authenticate(request, email=email, password=password)
+        
         if user is not None:
             login(request, user)
-            return redirect(next_url)
+            return redirect('clipapp:dashboard')
         else:
             messages.error(request, "Invalid email or password")
-
+    
     return render(request, 'clipapp/login.html')
 
 
