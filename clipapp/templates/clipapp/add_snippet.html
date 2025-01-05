@@ -138,7 +138,7 @@ setupTagInput();
                     tags.clear();
                     renderTags();
                     // Optionally redirect to dashboard or snippet list
-                    window.location.href = 'http://127.0.0.1:8000/dashboard/';
+                    window.location.href = '/dashboard/';
                 } else {
                     const errorData = await response.json();
                     const errorMessage = errorData.detail || 
