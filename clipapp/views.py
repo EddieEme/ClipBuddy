@@ -6,6 +6,7 @@ from django.contrib import messages
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.core.paginator import Paginator
 from .models import Snippet, UserTestimonial
 from .serializers import SnippetSerializer
 from django.contrib.auth.decorators import login_required
@@ -28,8 +29,12 @@ def index(request):
     return render(request, 'clipapp/index.html')
 
 def home(request):
-    return render(request, 'clipapp/home.html')
-
+    testimonials_list = UserTestimonial.objects.all()
+    paginator = Paginator(testimonials_list, 10)
+    
+    page_number = request.GET.get('page')
+    testimonials = paginator.get_page(page_number)
+    return render(request, 'clipapp/home.html', {'testimonials': testimonials})
 
 @login_required
 def testimonial_view(request):
@@ -99,7 +104,7 @@ def login_view(request):
         else:
             messages.error(request, "Invalid email or password")
     
-    return render(request, 'clipapp/login.html')
+    return render(request, 'clipapp/login.html', {'messeges': messages})
 
 
 

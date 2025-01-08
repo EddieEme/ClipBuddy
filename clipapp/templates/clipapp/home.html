@@ -1,6 +1,41 @@
 {% extends 'clipapp/index.html' %}
 {% comment %} {% block title %}Home{% endblock %} {% endcomment %}
 {% block content %}
+<style>
+.testimonials-wrapper {
+    display: flex;
+    gap: 20px;
+    overflow: hidden; /* Hide overflow content */
+    white-space: nowrap; /* Prevent line breaks */
+    animation: scroll 15s linear infinite;
+}
+
+.testimonial-card {
+    display: inline-block;
+    min-width: 300px;
+    max-width: 400px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+.testimonial-card p {
+    word-wrap: break-word;
+    white-space: normal;
+    margin-bottom: 10px;  
+} 
+
+@keyframes scroll {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(-100%);
+    }
+}
+</style>
   <section class="hero">
         <div class="hero-container">
             <div class="hero-content">
@@ -45,16 +80,24 @@
         </div>
     </section>
 
-    <section class="testimonials">
-        <div class="testimonials-container">
-            <h2>What Our Users Say</h2>
-            <div class="testimonial-card">
-                <p>"ClipBuddy has revolutionized how I manage my code snippets. It's an essential tool in my daily
-                    workflow."</p>
-                <cite>- Sarah Chen, Software Engineer</cite>
-            </div>
+ <section class="testimonials">
+    <div class="testimonials-container">
+        <h2>What Our Users Say</h2>
+        <div class="testimonials-wrapper">
+            {% if testimonials %}
+                {% for testimonial in testimonials %}
+                    <div class="testimonial-card">
+                        <p>"{{ testimonial.text }}"</p>
+                        <cite>- {{ testimonial.user.first_name }}, {{ testimonial.occupation }}</cite>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No testimonials available at the moment. Be the first to share your experience!</p>
+            {% endif %}
         </div>
-    </section>
+    </div>
+</section>
+
 
     <footer class="footer">
         <div class="footer-container">
@@ -102,6 +145,7 @@
 
         // Run animation every 6 seconds
         setInterval(animateSnippets, 6000);
+
     </script>
 
     {% endblock %}
