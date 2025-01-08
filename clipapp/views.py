@@ -29,12 +29,13 @@ def index(request):
     return render(request, 'clipapp/index.html')
 
 def home(request):
-    testimonials_list = UserTestimonial.objects.all()
-    paginator = Paginator(testimonials_list, 10)
+    testimonials = UserTestimonial.objects.all().order_by('-created_at')
+    items_per_page = 10
+    paginator = Paginator(testimonials, items_per_page)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
     
-    page_number = request.GET.get('page')
-    testimonials = paginator.get_page(page_number)
-    return render(request, 'clipapp/home.html', {'testimonials': testimonials})
+    return render(request, 'clipapp/home.html', {'testimonials': page_obj})
 
 @login_required
 def testimonial_view(request):

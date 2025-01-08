@@ -152,7 +152,7 @@ ACCOUNT_SIGNUP_TEMPLATE = None
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
 
-# # Provider specific settings
+# Provider specific settings
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
