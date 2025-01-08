@@ -85,7 +85,7 @@ def register_view(request):
             password=password
         )
         
-        messages.success(request, "Registration successful.")
+        messages.success(request, "Registration successful. Login here")
         return redirect('clipapp:login')
     return render(request, 'clipapp/register.html')
 
