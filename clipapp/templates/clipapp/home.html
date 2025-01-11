@@ -1,26 +1,60 @@
 {% extends 'clipapp/index.html' %}
 {% comment %} {% block title %}Home{% endblock %} {% endcomment %}
 {% block content %}
+<style>
+.testimonials-wrapper {
+    display: flex;
+    gap: 20px;
+    overflow: hidden; /* Hide overflow content */
+    white-space: nowrap; /* Prevent line breaks */
+    animation: scroll 15s linear infinite;
+}
+
+.testimonial-card {
+    display: inline-block;
+    min-width: 300px;
+    max-width: 400px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+.testimonial-card p {
+    word-wrap: break-word;
+    white-space: normal;
+    margin-bottom: 10px;  
+} 
+
+
+@keyframes scroll {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(-100%);
+    }
+}
+</style>
   <section class="hero">
         <div class="hero-container">
             <div class="hero-content">
-                <h1>Manage Your Snippets Like a Pro</h1>
-                <p>Store, organize, and access your code snippets from anywhere. Boost your productivity with
+                <h1>Manage Your Notes Like a Pro</h1>
+                <p>Store, organize, and access your code notes from anywhere. Boost your productivity with
                     ClipBuddy's intelligent clipboard manager.</p>
                 <a href="{% url 'clipapp:login' %}" class="cta-button">Get Started</a>
             </div>
             <div class="hero-image">
                 <div class="demo-container">
                     <div class="demo-snippet">
-                        console.log("Hello World!");
+                    My experience with ALX Software Engeneering
                     </div>
                     <div class="demo-snippet">
-                        def greet(name):
-                        return f"Hello, {name}!"
+                        My First Portfolio Project
                     </div>
                     <div class="demo-snippet">
-                        SELECT * FROM users
-                        WHERE active = true;
+                    The Begining of my Journey
                     </div>
                 </div>
             </div>
@@ -32,31 +66,39 @@
             <div class="feature-card">
                 <div class="feature-icon">📋</div>
                 <h3>Smart Organization</h3>
-                <p>Automatically categorize your snippets with intelligent tagging and search.</p>
+                <p>Automatically categorize your notes with intelligent tagging and search.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🔄</div>
                 <h3>Sync Everywhere</h3>
-                <p>Access your snippets across all your devices with real-time synchronization.</p>
+                <p>Access your notes across all your devices with real-time synchronization.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🔍</div>
                 <h3>Quick Search</h3>
-                <p>Find any snippet instantly with powerful search and filtering capabilities.</p>
+                <p>Find any note instantly with powerful search and filtering capabilities.</p>
             </div>
         </div>
     </section>
 
-    <section class="testimonials">
-        <div class="testimonials-container">
-            <h2>What Our Users Say</h2>
-            <div class="testimonial-card">
-                <p>"ClipBuddy has revolutionized how I manage my code snippets. It's an essential tool in my daily
-                    workflow."</p>
-                <cite>- Sarah Chen, Software Engineer</cite>
-            </div>
+<section class="testimonials">
+    <div class="testimonials-container">
+        <h2>What Our Users Say</h2>
+        <div class="testimonials-wrapper">
+            {% if testimonials %}
+                {% for testimonial in testimonials %}
+                    <div class="testimonial-card">
+                        <p>"{{ testimonial.text }}"</p>
+                        <cite>- {{ testimonial.user.first_name }}, {{ testimonial.occupation }}</cite>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No testimonials available at the moment. Be the first to share your experience!</p>
+            {% endif %}
         </div>
-    </section>
+    </div>
+</section>
+
 
     <footer class="footer">
         <div class="footer-container">
@@ -86,11 +128,11 @@
     </footer>
 
     <script>
-        // Simple scroll animation for demo snippets
-        const demoSnippets = document.querySelectorAll('.demo-snippet');
+        // Simple scroll animation for demo notes
+        const demonotes = document.querySelectorAll('.demo-snippet');
 
-        function animateSnippets() {
-            demoSnippets.forEach((snippet, index) => {
+        function animatenotes() {
+            demonotes.forEach((snippet, index) => {
                 setTimeout(() => {
                     snippet.style.transform = 'translateY(-10px)';
                     snippet.style.opacity = '0';
@@ -103,7 +145,8 @@
         }
 
         // Run animation every 6 seconds
-        setInterval(animateSnippets, 6000);
+        setInterval(animatenotes, 6000);
+
     </script>
 
     {% endblock %}

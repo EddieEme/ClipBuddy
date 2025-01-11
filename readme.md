@@ -4,19 +4,20 @@
 
 ## **List of Team Members**
 1. Emeremnu Ediosn M (edisonemeremnu@gmail.com)
-2. Tasie Ibiam
+2. Tasie Ibiam (tasieibiam28@gmail.com)
 
 ---
 
 
 ## **Description of the Project**
-**ClipBuddy** is a web-based clipboard manager designed to help users save, organize, and retrieve their copied text snippets. With this app, users can:
-- Store clipboard snippets securely in the cloud.
-- Tag and categorize their snippets for easy organization.
-- Search, edit, and delete snippets as needed.
-- Access their clipboard history across devices.
+**ClipBuddy** is a web-based clipboard manager designed to help users save,
+organize, and retrieve their copied notes. With this app, users can:
+- Store notes securely in the cloud.
+- Tag and categorize their notes for easy organization.
+- Search, edit, and delete notes as needed.
+- Access their note history across devices.
 
-The application ensures productivity by eliminating the need to repeatedly copy and paste the same content.
+The application ensures productivity by eliminating the need to repeatedly create the same content.
 
 ---
 

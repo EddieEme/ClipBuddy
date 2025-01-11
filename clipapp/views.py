@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Snippet
+from django.core.paginator import Paginator
+from .models import Snippet, UserTestimonial
 from .serializers import SnippetSerializer
 from django.contrib.auth.decorators import login_required
 from rest_framework.permissions import IsAuthenticated
@@ -13,6 +15,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework.pagination import PageNumberPagination
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse, HttpResponseNotFound
+from .forms import TestimonialForm
 
 
 
@@ -26,7 +29,34 @@ def index(request):
     return render(request, 'clipapp/index.html')
 
 def home(request):
-    return render(request, 'clipapp/home.html')
+    testimonials = UserTestimonial.objects.all().order_by('-created_at')
+    items_per_page = 10
+    paginator = Paginator(testimonials, items_per_page)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'clipapp/home.html', {'testimonials': page_obj})
+
+@login_required
+def testimonial_view(request):
+    """
+    If the user is not authenticated, redirect them to login.
+    After login, redirect them back to this testimonial view.
+    """
+    if request.method == 'POST':
+        form = TestimonialForm(request.POST)
+        if form.is_valid():
+            testimonial = form.save(commit=False)
+            testimonial.user = request.user
+            testimonial.save()
+            messages.success(request, 'Thank you for your testimonial!')
+            return redirect('clipapp:testimonial')
+    else:
+        form = TestimonialForm()
+
+    return render(request, 'clipapp/testimonial.html', {'form': form})
+
+
 
 def register_view(request):
     if request.method == 'POST':
@@ -56,9 +86,10 @@ def register_view(request):
             password=password
         )
         
-        messages.success(request, "Registration successful.")
+        messages.success(request, "Registration successful. Login here")
         return redirect('clipapp:login')
     return render(request, 'clipapp/register.html')
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -74,7 +105,18 @@ def login_view(request):
         else:
             messages.error(request, "Invalid email or password")
     
-    return render(request, 'clipapp/login.html')
+    return render(request, 'clipapp/login.html', {'messeges': messages})
+
+
+
+def logout_view(request):
+    if request.method == 'POST':
+        logout(request)
+        return JsonResponse({"message": "Successfully logged out"}, status=200)
+    else:
+        return JsonResponse({"error": "Invalid request method"}, status=405)
+    
+
 
 @login_required(login_url='clipapp:login') 
 def dashboard_view(request):
@@ -92,7 +134,7 @@ def user_setting(request):
 
 
 
-
+@login_required(login_url='clipapp:login') 
 def edit_view(request, id):
     snippet = get_object_or_404(Snippet, id=id)
 
@@ -108,33 +150,6 @@ def edit_view(request, id):
 
     return render(request, 'clipapp/edit_snippet.html', {'snippet': snippet})
 
-
-# def delete_view(request, id):
-#     """
-#     View to delete an object by ID.
-#     """
-#     obj = get_object_or_404(YourModel, id=id)
-#     obj.delete()
-#     messages.success(request, "The item has been successfully deleted.")
-
-#     return redirect('clipapp:dashboard')
-
-
-# class SnippetView(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     def post(self, request):
-#         # Add the user to the request data
-#         data = request.data.copy()
-#         data['user'] = request.user.id
-        
-#         serializer = SnippetSerializer(data=data)
-#         if serializer.is_valid():
-#             serializer.save(user=request.user)
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    
 
 # ..............................................APIs........................................................
 class SnippetView(APIView):
