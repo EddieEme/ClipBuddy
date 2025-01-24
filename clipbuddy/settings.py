@@ -106,9 +106,9 @@ DATABASES = {
 }
 
 
-DATABASE_URL = config("DATABASE_URL", default="")
-if DATABASE_URL:
-    DATABASES["default"] = dj_database_url.parse(DATABASE_URL)
+# DATABASE_URL = config("DATABASE_URL", default="")
+# if DATABASE_URL:
+#     DATABASES["default"] = dj_database_url.parse(DATABASE_URL)
 
 
 
@@ -153,15 +153,15 @@ SOCIALACCOUNT_LOGIN_ON_GET = True
 
 
 # Provider specific settings
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'APP': {
-            'client_id': config('GOOGLE_CLIENT_ID'),
-            'secret': config('GOOGLE_CLIENT_SECRET'),
-            'key': ''
-        }
-    }
-}
+# SOCIALACCOUNT_PROVIDERS = {
+#     'google': {
+#         'APP': {
+#             'client_id': config('GOOGLE_CLIENT_ID'),
+#             'secret': config('GOOGLE_CLIENT_SECRET'),
+#             'key': ''
+#         }
+#     }
+# }
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
