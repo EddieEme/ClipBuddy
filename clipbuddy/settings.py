@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     
+    'django_extensions',
+    
 ]
 
 
@@ -77,7 +79,7 @@ ROOT_URLCONF = 'clipbuddy.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')], 
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -151,6 +153,16 @@ ACCOUNT_LOGIN_TEMPLATE = None
 ACCOUNT_SIGNUP_TEMPLATE = None
 SOCIALACCOUNT_LOGIN_ON_GET = True
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+
+
+DEFAULT_FROM_EMAIL = 'ClipBuddy <edisonemeremnu@gmail.com>'
+PASSWORD_RESET_TIMEOUT = 300
 
 # Provider specific settings
 # SOCIALACCOUNT_PROVIDERS = {
