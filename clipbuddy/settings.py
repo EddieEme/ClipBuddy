@@ -165,15 +165,15 @@ DEFAULT_FROM_EMAIL = 'ClipBuddy <edisonemeremnu@gmail.com>'
 PASSWORD_RESET_TIMEOUT = 300
 
 # Provider specific settings
-# SOCIALACCOUNT_PROVIDERS = {
-#     'google': {
-#         'APP': {
-#             'client_id': config('GOOGLE_CLIENT_ID'),
-#             'secret': config('GOOGLE_CLIENT_SECRET'),
-#             'key': ''
-#         }
-#     }
-# }
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': config('GOOGLE_CLIENT_ID'),
+            'secret': config('GOOGLE_CLIENT_SECRET'),
+            'key': ''
+        }
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
